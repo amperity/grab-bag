@@ -10,7 +10,7 @@
         summary (eval/eval-in-project
                  mega-project
                  `(do
-                    (plumbing.error/init-logger! :fatal)
+                    #_(plumbing.error/init-logger! :fatal)
                     (let [summary# (lein-repo.test/test-dirs
                                     ~(vec (plugin/ordered-source-and-test-paths))
                                     :test-selector ~(keyword (or option "fast")))]
