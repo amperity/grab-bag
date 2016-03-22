@@ -229,6 +229,7 @@
         internal-projs (map read-project-file internal-deps)
         test-paths (distinct (mapcat :test-paths internal-projs))]
     (-> base
+        (dissoc :finagle-clojure)
         (assoc :internal-dependencies internal-deps
                :test-paths test-paths)
         (update-in [:dependencies] conj ['lein-repo lein-version])
