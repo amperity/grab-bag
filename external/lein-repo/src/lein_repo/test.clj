@@ -37,7 +37,8 @@
          (when (and (:test (meta v)))
            (assert (<= (count (filter (meta v) [:unit :system :integration])) 1))
            (let [weird-keys
-                 (remove (into test-labels #{:ns :name :file :line :test :column})
+                 (remove (into test-labels #{:ns :name :file :line :test :column
+                                             :clojure.test.check.clojure-test/defspec :arglists})
                          (keys (meta v)))]
              (when (seq weird-keys)
                (println "WARNING: got unexpected metadata keys" weird-keys "for" (meta v))))
