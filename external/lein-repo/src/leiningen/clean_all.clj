@@ -1,4 +1,5 @@
 (ns leiningen.clean-all
+  "Clean all internal projects."
   (:require [leiningen.core.eval :as eval]
             [leiningen.clean :as clean]
             [lein-repo.plugin :as plugin]))
