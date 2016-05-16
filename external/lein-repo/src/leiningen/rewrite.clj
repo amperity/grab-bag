@@ -47,8 +47,10 @@
   [^java.io.File project-clj]
   (let [project-edn (read-project-edn project-clj)]
     (when-let [deps (get-from-proj project-edn :external-dependencies)]
-      (let [qualified (map qualify-dep deps)
-            combined (vec (concat qualified (get-from-proj project-edn :dependencies)))]
+      (let [required  ('required-dependencies plugin/repo-config)
+            qualified (map qualify-dep deps)
+            direct    (get-from-proj project-edn :dependencies)
+            combined  (vec (concat required qualified direct))]
         (set-in-proj project-edn :dependencies combined)))))
 
 (defn backup-file
