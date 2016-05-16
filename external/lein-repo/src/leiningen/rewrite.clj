@@ -73,7 +73,9 @@
     (when-let [updated (updated-project-edn project-clj)]
       (println "Rewriting" canonical-path)
       (move-file project-clj (backup-file project-clj) false)
-      (spit project-clj (with-out-str (pprint/pprint updated))))))
+      (spit project-clj (with-out-str 
+                          (binding [pprint/*print-right-margin* 70] 
+                            (pprint/pprint updated)))))))
 
 (defn restore-project-file
   [^java.io.File project-clj]
