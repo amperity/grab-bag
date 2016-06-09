@@ -4,7 +4,7 @@
             [clojure.set :as set]
             [clojure.pprint :as pprint]
             [clojure.java.shell :as shell]
-            leiningen.core.project)
+            [leiningen.core.project :as project]
   (:import [java.io File]
            [java.util HashMap Stack Queue]
            [java.util.jar Manifest JarEntry JarOutputStream]))
@@ -124,11 +124,13 @@
    :repositories merge
    :plugins concat-distinct
    :repl-options (fn [p1 p2] (merge-with concat-distinct p1 p2))
-   :profiles (fn [p1 p2] (merge-with merge-projects p1 p2))
+   :profiles (fn [p1 p2]
+               (merge-with merge-projects p1 p2))
 
    ;; cljx specific
    :prep-tasks concat-distinct
-   :cljx (fn [a b] {:builds (concat-distinct (:builds a) (:builds b))})})
+   :cljx (fn [a b] {:builds (concat-distinct (:builds a) (:builds b))})
+   :jvm-opts concat-distinct})
 
 (defn fix-cljx
   "Cljx paths are not properly normalized like other source paths; manually ensure they are
@@ -159,6 +161,9 @@
   (->> projects
        (map normalize-project)
        (apply merge-with-keyfn project-merge-fns)))
+
+(defn merge-projects-without-normalize [& projects]
+  (apply merge-with-keyfn project-merge-fns projects))
 
 (declare test-all-project*)
 
@@ -223,6 +228,11 @@
                 :eval-in :subprocess
                 :jvm-opts ^:replace ["-Xmx600m" "-XX:MaxPermSize=256m"])))))
 
+(defn merge-test-profile
+  "Can't figure out how to make the task respect the :test profile, so
+  just merge the :test profile map into the project"
+  [megatask]
+  (merge-projects-without-normalize megatask (get-in megatask [:profiles :test])))
 
 (defn test-all-project* [base]
   (let [internal-deps (all-internal-deps)
@@ -234,18 +244,18 @@
                :test-paths test-paths)
         (update-in [:dependencies] conj ['lein-repo lein-version])
         middleware
+        merge-test-profile
         (update-in [:source-paths] concat test-paths)
         (dissoc :warn-on-reflection)
         (assoc :root repo-root
                :eval-in :subprocess
-               :jvm-opts ^:replace ["-Xmx1000m" "-XX:+UseConcMarkSweepGC" "-XX:+CMSClassUnloadingEnabled" "-XX:MaxPermSize=512M"]))))
+               ;;:jvm-opts ^:replace ["-Xmx1000m" "-XX:+UseConcMarkSweepGC" "-XX:+CMSClassUnloadingEnabled" "-XX:MaxPermSize=512M"]
+               ))))
 
-(def test-all-project
-  (delay (test-all-project*
-          (read-project-file (first (all-internal-deps))))))
+(def test-all-project (memoize test-all-project*))
 
-(defn ordered-source-and-test-paths [& [no-tests?]]
-  (let [mega-project @test-all-project
+(defn ordered-source-and-test-paths [base & [no-tests?]]
+  (let [mega-project (test-all-project base)
         blacklist []]
     (->> (ordered-projects mega-project)
          (mapcat (fn [p] (let [f (read-project-file p)]
