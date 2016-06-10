@@ -6,13 +6,13 @@
             [leiningen.core.classpath :as classpath]))
 
 (defn test-all [project & [option]]
-  (let [mega-project @plugin/test-all-project
+  (let [mega-project (plugin/test-all-project project)
         summary (eval/eval-in-project
                  mega-project
                  `(do
                     #_(plumbing.error/init-logger! :fatal)
                     (let [summary# (lein-repo.test/test-dirs
-                                    ~(vec (plugin/ordered-source-and-test-paths))
+                                    ~(vec (plugin/ordered-source-and-test-paths project))
                                     :test-selector ~(keyword (or option "fast")))]
                       (println summary#)
                       (System/exit (+ (:error summary# 0) (:fail summary# 0)))))
