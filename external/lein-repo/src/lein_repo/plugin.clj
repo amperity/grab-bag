@@ -4,7 +4,7 @@
             [clojure.set :as set]
             [clojure.pprint :as pprint]
             [clojure.java.shell :as shell]
-            [leiningen.core.project :as project]
+            [leiningen.core.project :as project])
   (:import [java.io File]
            [java.util HashMap Stack Queue]
            [java.util.jar Manifest JarEntry JarOutputStream]))
