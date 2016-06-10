@@ -124,13 +124,13 @@
    :repositories merge
    :plugins concat-distinct
    :repl-options (fn [p1 p2] (merge-with concat-distinct p1 p2))
+   :jvm-opts concat-distinct
    :profiles (fn [p1 p2]
                (merge-with merge-projects p1 p2))
 
    ;; cljx specific
    :prep-tasks concat-distinct
-   :cljx (fn [a b] {:builds (concat-distinct (:builds a) (:builds b))})
-   :jvm-opts concat-distinct})
+   :cljx (fn [a b] {:builds (concat-distinct (:builds a) (:builds b))})})
 
 (defn fix-cljx
   "Cljx paths are not properly normalized like other source paths; manually ensure they are
@@ -231,8 +231,8 @@
 (defn merge-test-profile
   "Can't figure out how to make the task respect the :test profile, so
   just merge the :test profile map into the project"
-  [megatask]
-  (merge-projects-without-normalize megatask (get-in megatask [:profiles :test])))
+  [megaproject]
+  (merge-projects-without-normalize megaproject (get-in megaproject [:profiles :test])))
 
 (defn test-all-project* [base]
   (let [internal-deps (all-internal-deps)
