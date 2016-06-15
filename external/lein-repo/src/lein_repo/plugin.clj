@@ -225,8 +225,9 @@
          (update-in [:dependencies] conj ['lein-repo lein-version])
          middleware
          (assoc :root repo-root
-                :eval-in :subprocess
-                :jvm-opts ^:replace ["-Xmx600m" "-XX:MaxPermSize=256m"])))))
+                ;;:eval-in :subprocess
+                ;;:jvm-opts ^:replace ["-Xmx600m" "-XX:MaxPermSize=256m"]
+                )))))
 
 (defn merge-test-profile
   "Can't figure out how to make the task respect the :test profile, so
@@ -248,7 +249,7 @@
         (update-in [:source-paths] concat test-paths)
         (dissoc :warn-on-reflection)
         (assoc :root repo-root
-               :eval-in :subprocess
+               ;;:eval-in :subprocess
                ;;:jvm-opts ^:replace ["-Xmx1000m" "-XX:+UseConcMarkSweepGC" "-XX:+CMSClassUnloadingEnabled" "-XX:MaxPermSize=512M"]
                ))))
 
