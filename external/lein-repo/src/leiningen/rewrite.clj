@@ -51,11 +51,12 @@
     (let [dep-project-path     (str plugin/repo-root "/" spec)
           checkouts-dir        (jio/file current-project-path "checkouts")
           _                    (.mkdir checkouts-dir)
+          munged-dep           (munge (str dep))
+          _                    (println "Creating symlink" munged-dep "->" dep-project-path)
           _                    (Files/createSymbolicLink 
-                                 (.toPath (jio/file checkouts-dir (str dep))) 
+                                 (.toPath (jio/file checkouts-dir munged-dep)) 
                                  (.toPath (jio/file dep-project-path)) 
                                  (make-array java.nio.file.attribute.FileAttribute 0))
-          _                    (println "Creating symlink" dep "->" dep-project-path)
           dep-project-clj-path (str dep-project-path "/project.clj")
           dep-project-clj      (read-project-edn (jio/as-file dep-project-clj-path))
           dep-version          (nth dep-project-clj 2)]
